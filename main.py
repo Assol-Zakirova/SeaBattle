@@ -1,49 +1,37 @@
+import os
 import generation as gen
+launch_generation = gen.BigShip()
+launch_generation.generation()
 
 def asking_for_name():
     name = input('Please, enter your name\n')
+    os.system('clear')
     return name
 
-mixed_right_coordinates = []
-right_coordinates = []
-def adding_coordinates():
-    global mixed_right_coordinates
-    global right_coordinates
-    for i in gen.big_ship_coordinates:
-        mixed_right_coordinates.append(i)
-    for j in gen.middle_ship_coordinates:
-        mixed_right_coordinates.append(j)
-    for k in gen.little_ship_coordinates:
-        mixed_right_coordinates.append(k)
+field_2 = [['*'] * 7 for i in range(7)]
+for i in gen.mixed_right_coordinates:
+    a, b = i
+    field_2[a][b] = 'R'
+for row in field_2:
+    print(*row)
 
-    right_coordinates = [
-        gen.big_ship_coordinates,
-        gen.middle_ship_coordinates[:2],
-        gen.middle_ship_coordinates[2:],
-        [gen.little_ship_coordinates[0]],
-        [gen.little_ship_coordinates[1]],
-        [gen.little_ship_coordinates[2]],
-    ]
-
-gen.Calling().big_ship_call()
-adding_coordinates()
-
-field = [['*'] * 7 for i in range(7)]
-all_guessed_coordinates = []
-right_guessed_coordinates = []
-amount_of_shots = 0
 
 class Game:
+    def __init__(self):
+        self.field = [['*'] * 7 for i in range(7)]
+        self.all_guessed_coordinates = []
+        self.right_guessed_coordinates = []
+        self.amount_of_shots = 0
     def intro(self):
-        global amount_of_shots
-        while len(mixed_right_coordinates) != 0:
+        while len(gen.mixed_right_coordinates) != 0:
             try:
+                os.system('clear')
                 print('  1 2 3 4 5 6 7')
                 rows = 'ABCDEFG'
                 for i in range(7):
-                    print(rows[i], *field[i])
+                    print(rows[i], *self.field[i])
                 users_coordinate = input('Enter the coordinates(from 1 to 7): like A, 1\n')
-                amount_of_shots += 1
+                self.amount_of_shots += 1
                 users_coordinate = users_coordinate.split(',')
                 a, b = users_coordinate
                 b = int(b)
@@ -57,66 +45,67 @@ class Game:
         self.ending()
 
     def check_1(self, users_coordinate):
-        if users_coordinate not in all_guessed_coordinates:
-            if users_coordinate in mixed_right_coordinates:
+        if users_coordinate not in self.all_guessed_coordinates:
+            if users_coordinate in gen.mixed_right_coordinates:
                 a, b = users_coordinate
-                field[a][b] = 'H'
-                mixed_right_coordinates.remove(users_coordinate)
-                right_guessed_coordinates.append(users_coordinate)
-                all_guessed_coordinates.append(users_coordinate)
+                self.field[a][b] = 'H'
+                gen.mixed_right_coordinates.remove(users_coordinate)
+                self.right_guessed_coordinates.append(users_coordinate)
+                self.all_guessed_coordinates.append(users_coordinate)
             else:
                 a, b = users_coordinate
-                field[a][b] = 'M'
-                all_guessed_coordinates.append(users_coordinate)
+                self.field[a][b] = 'M'
+                self.all_guessed_coordinates.append(users_coordinate)
             self.check_2()
         else:
             print('You have already entered these coordinates, please try again')
 
     def check_2(self):
-        for i in right_coordinates:
+        for i in gen.right_coordinates:
             l = len(i)
             counter = 0
             ship_for_sunk = []
             for j in i:
                 ship_for_sunk.append(j)
-                if j in right_guessed_coordinates:
+                if j in self.right_guessed_coordinates:
                     counter += 1
                     if counter == l:
                         for k, h in ship_for_sunk:
-                            field[k][h] = 'S'
+                            self.field[k][h] = 'S'
     def ending(self):
-        global max_counter
-        global c
-        global max_counter_2
-        global field
-        global all_guessed_coordinates
-        global right_guessed_coordinates
-        global amount_of_shots
-        global mixed_right_coordinates
-        global right_coordinates
+        os.system('clear')
         continue_game = input('Do you wanna play the game again? Yes/No\n')
         if continue_game == 'Yes':
-            max_counter = 0
-            c = 0
-            max_counter_2 = 0
-            mixed_right_coordinates = []
-            right_coordinates = []
-            gen.Calling().big_ship_call()
-            adding_coordinates()
-            field = [['*'] * 7 for i in range(7)]
-            all_guessed_coordinates = []
-            right_guessed_coordinates = []
-            amount_of_shots = 0
+            os.system('clear')
+            launch_generation = gen.BigShip()
+            launch_generation.generation()
+            field_2 = [['*'] * 7 for i in range(7)]
+            for i in gen.mixed_right_coordinates:
+                a, b = i
+                field_2[a][b] = 'R'
+            for row in field_2:
+                print(*row)
+            game = Game()
             game.intro()
         else:
-            
-            with open("participants.txt", "a") as f:
-                f.write(f'{users_name} - {amount_of_shots}\n')
+            os.system('clear')
             with open("participants.txt") as f:
-                print(f.read())
+                lines = f.readlines()
+
+            players = []
+
+            for line in lines:
+                name, shots = line.strip().split(' - ')
+                players.append((name, int(shots)))
+            players.sort(key=lambda x: x[1])
+
+            print('The list of participants from the highest to the lowest score:')
+            for name, shots in players:
+                print(f'{name} - {shots}')
+
 
 users_name = asking_for_name()
 game = Game()
 game.intro()
-game.ending()
+
 
