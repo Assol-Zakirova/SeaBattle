@@ -1,5 +1,6 @@
-import os
 import generation as gen
+import os
+
 launch_generation = gen.BigShip()
 launch_generation.generation()
 
@@ -7,15 +8,6 @@ def asking_for_name():
     name = input('Please, enter your name\n')
     os.system('clear')
     return name
-
-field_2 = [['*'] * 7 for i in range(7)]
-for i in gen.mixed_right_coordinates:
-    a, b = i
-    field_2[a][b] = 'R'
-for row in field_2:
-    print(*row)
-
-
 class Game:
     def __init__(self):
         self.field = [['*'] * 7 for i in range(7)]
@@ -25,7 +17,6 @@ class Game:
     def intro(self):
         while len(gen.mixed_right_coordinates) != 0:
             try:
-                os.system('clear')
                 print('  1 2 3 4 5 6 7')
                 rows = 'ABCDEFG'
                 for i in range(7):
@@ -39,11 +30,12 @@ class Game:
                 d2 = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6}
                 users_coordinate = (d2[a], d[b])
                 self.check_1(users_coordinate)
+                os.system('clear')
             except:
+                os.system('clear')
                 print("Invalid input. Example: A,1")
                 continue
         self.ending()
-
     def check_1(self, users_coordinate):
         if users_coordinate not in self.all_guessed_coordinates:
             if users_coordinate in gen.mixed_right_coordinates:
@@ -59,7 +51,6 @@ class Game:
             self.check_2()
         else:
             print('You have already entered these coordinates, please try again')
-
     def check_2(self):
         for i in gen.right_coordinates:
             l = len(i)
@@ -79,33 +70,35 @@ class Game:
             os.system('clear')
             launch_generation = gen.BigShip()
             launch_generation.generation()
-            field_2 = [['*'] * 7 for i in range(7)]
-            for i in gen.mixed_right_coordinates:
-                a, b = i
-                field_2[a][b] = 'R'
-            for row in field_2:
-                print(*row)
             game = Game()
             game.intro()
         else:
             os.system('clear')
-            with open("participants.txt") as f:
-                lines = f.readlines()
-
+            with open("participants.txt", "a") as f:
+                f.write(f"{users_name} - {self.amount_of_shots}\n")
             players = []
+            with open("participants.txt") as f:
+                for line in f:
+                    line = line.strip()
 
-            for line in lines:
-                name, shots = line.strip().split(' - ')
-                players.append((name, int(shots)))
-            players.sort(key=lambda x: x[1])
+                    if not line:
+                        continue  
+
+                    if ' - ' not in line:
+                        continue  
+
+                    name, shots = line.split(' - ')
+                    players.append((name, int(shots)))
+                    players.sort(key=lambda x: x[1])
 
             print('The list of participants from the highest to the lowest score:')
             for name, shots in players:
                 print(f'{name} - {shots}')
-
-
 users_name = asking_for_name()
 game = Game()
 game.intro()
+
+
+
 
 
